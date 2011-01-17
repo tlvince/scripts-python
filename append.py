@@ -1,5 +1,4 @@
 import sys
-import io
 
 def append(file, arr):
     str = ' '.join(arr)
