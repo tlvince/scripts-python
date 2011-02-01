@@ -42,7 +42,7 @@ def download(remote, local):
             block += block
     return total
 
-def verifyDownload(fileSize):
+def verifyDownload(fileSize, local):
     """Make some attempts to check the file was downloaded correctly."""
     try:
         assert os.stat(local).st_size == total
@@ -57,12 +57,13 @@ def downloadProgress(blockSize, totalSize):
     sys.stdout.flush()
 
 def isDownloaded(path):
-    """Naively check if it's already downloaded"""
+    """Naively check if it's already downloaded."""
     try:
         if os.path.isfile(path):
             raise Exception
     except Exception:
-        print("Skipping download...")
+        logging.warning("Using existing file:\n{0}".format(path))
+        logging.info("Skipping download")
         return True
 
 def extract(source, target, prefix):
@@ -75,15 +76,19 @@ def extract(source, target, prefix):
         # move it to the real target
         shutil.move(os.path.join(os.path.dirname(target), prefix), target)
     except WindowsError:
-        print("Have you closed Chromium?")
+        logging.error("Cannot extract to {0}".format(target))
+        logging.info(
+            "Windows prevents running programs from being overwritten."
+        )
+        logging.info("Please close Chromium and try again.")
 
 def getLogger():
     """Setup the console logger."""
     logger = logging.getLogger()
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(filename)s: %(message)s")
+    formatter = logging.Formatter("%(levelname)s: %(message)s")
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
@@ -96,13 +101,11 @@ def main():
     extractPath = os.path.join(os.path.expandvars("%ProgramFiles%"), "Chromium")
 
     getLogger()
-
-    build = getBuild(url + "LATEST")
-    download(url + "/" + build + "/" + chrome, savePath)
-    #if not isDownloaded(savePath):
-        #build = getBuild(url + "LATEST")
-        #download(url + "/" + build, chrome, local)
-    #extract(savePath, extractPath, chrome)
+    if not isDownloaded(savePath):
+        build = getBuild(url + "LATEST")
+        size = download(url + "/" + build + "/" + chrome, savePath)
+        verifyDownload(size, savePath)
+    extract(savePath, extractPath, chrome)
 
 if __name__ == "__main__":
     main()
