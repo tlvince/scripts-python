@@ -8,25 +8,53 @@ import os.path
 import shutil
 import zipfile
 import logging
+import sys
 
 def getBuild(url):
     """Return the latest build number."""
     try:
         page = urllib.request.urlopen(url)
         build = page.read().decode()
-        logging.info("Found build number: ${0}".format(build))
+        logging.info("Found build number: {0}".format(build))
         return build
     except urllib.error.HTTPError as e:
         logging.error(e)
         logging.info("A proxy has been detected but not configured.")
         logging.info("Try setting 'http_proxy' in the active terminal.")
 
-def download(url, file, dest):
-    """Download the given file from the given url to the given destination."""
-    remote = urllib.request.urlopen(url + "/" + file)
-    savePath = os.path.join(dest, file)
-    with open(savePath, mode="wb") as f:
-        f.write(remote.read())
+def download(remote, local):
+    """Download 'file' from 'url' to the given destination."""
+    logging.debug("Downloading from: {0}".format(remote))
+    logging.debug("Saving to: {0}".format(local))
+
+    response = urllib.request.urlopen(remote)
+    # See: http://docs.python.org/py3k/library/email.message.html
+    logging.debug(
+        "Connection headers:\n\n{0}".format(response.headers.as_string())
+    )
+    total = int(response.headers.get("Content-Length"))
+    block = 1024
+    with open(local, mode="ab") as f:
+        while block <= total:
+            downloadProgress(block, total)
+            data = response.read(block)
+            f.write(data)
+            block += block
+    return total
+
+def verifyDownload(fileSize):
+    """Make some attempts to check the file was downloaded correctly."""
+    try:
+        assert os.stat(local).st_size == total
+    except AssertionError:
+        logging.warning("Downloaded file size does not match expect.")
+        logging.info("The file maybe corrupt or incomplete.")
+
+def downloadProgress(blockSize, totalSize):
+    """A progress bar for download a file."""
+    percent = int((blockSize * 100) / totalSize)
+    sys.stdout.write("\rDownloaded: {0}%".format(percent))
+    sys.stdout.flush()
 
 def isDownloaded(path):
     """Naively check if it's already downloaded"""
@@ -52,7 +80,7 @@ def extract(source, target, prefix):
 def getLogger():
     """Setup the console logger."""
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     formatter = logging.Formatter("%(filename)s: %(message)s")
@@ -70,6 +98,7 @@ def main():
     getLogger()
 
     build = getBuild(url + "LATEST")
+    download(url + "/" + build + "/" + chrome, savePath)
     #if not isDownloaded(savePath):
         #build = getBuild(url + "LATEST")
         #download(url + "/" + build, chrome, local)
