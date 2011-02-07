@@ -6,10 +6,7 @@
 import os
 import ctypes
 import subprocess
-
-def promptPass(user):
-    """Ask for the user's password."""
-    return input("Password: ")
+import getpass
 
 def getMyDocs():
     """Return the path to My Documents.
@@ -36,8 +33,8 @@ def setProxies(user, password, host, port):
 
 def main():
     """Start execution of cmd."""
-    un = os.path.expandvars("%USERNAME%")
-    pw = promptPass(un)
+    un = getpass.getuser()
+    pw = getpass.getpass()
     setProxies(un, pw, "", "8080")
     subprocess.call(["cmd.exe"])
 
