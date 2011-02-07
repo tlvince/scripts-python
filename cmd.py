@@ -7,6 +7,7 @@ import os
 import ctypes
 import subprocess
 import getpass
+import sys
 
 def getMyDocs():
     """Return the path to My Documents.
@@ -18,25 +19,34 @@ def getMyDocs():
 
 def setProxies(user, password, host, port):
     """Set proxy variables for the currently running shell."""
-
     schemes = ["http", "https"]
-    for scheme in schemes:
 
+    for scheme in schemes:
         # XXX: https_proxy still uses http scheme
         base = scheme
         if scheme == "https":
             base = scheme[:-1]
-
         os.putenv(scheme + '_proxy',
             "{0}://{1}:{2}@{3}:{4}".format(base, user, password, host, port)
         )
+
+def postHook():
+    """Perform some platform-specific post operations."""
+    if sys.platform == "win32":
+        cmd = ["cmd.exe", "/k", "cd", getMyDocs()]
+        subprocess.call(cmd)
 
 def main():
     """Start execution of cmd."""
     un = getpass.getuser()
     pw = getpass.getpass()
-    setProxies(un, pw, "", "8080")
-    subprocess.call(["cmd.exe"])
+
+    # XXX: get these from CLI
+    host = ""
+    port = "8080"
+
+    setProxies(un, pw, host, port)
+    postHook()
 
 if __name__ == "__main__":
     main()
