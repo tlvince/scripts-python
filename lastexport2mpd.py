@@ -1,6 +1,10 @@
 #!/usr/bin/python3
-# lastexport2mpd.py
-# Copyright 2010 Tom Vincent <http://www.tlvince.com/contact/>
+# Copyright 2010-2011 Tom Vincent <http://www.tlvince.com/contact/>
+
+"""Convert the lastexport.py text-file format to match that of mpdscribble.
+
+See: http://www.tlvince.com/linux/local-music-scrobbling/
+"""
 
 import os
 import sys
