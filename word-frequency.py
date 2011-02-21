@@ -1,19 +1,41 @@
 #!/usr/bin/env python3
-# https://code.activestate.com/recipes/576699-python-word-frequency-count-using-sets-and-lists/#c4
+# Copyright 2011 Tom Vincent <http://www.tlvince.com/contact/>
+
+"""Count the frequency of unique words in a file.
+
+See: https://code.activestate.com/recipes/576699/#c4
+"""
 
 import re
 import sys
+import argparse
 
 from collections import Counter
 
-wordre = re.compile(r'\w+')
-
 def words(f):
+    """Return each word in a line."""
+    wordre = re.compile(r'\w+')
     for line in f:
         for word in wordre.findall(line):
             yield word
 
-with open(sys.argv[1]) as f:
-    c = Counter(words(f))
+def parseArguments():
+    """Parse the command-line arguments."""
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("files", nargs="+", help="the file(s) to process")
+    parser.add_argument("-c", "--count", type=int, default=20,
+        help="the amount of words to consider"
+    )
+    return parser.parse_args()
 
-[print(w) for w in c.most_common(20)]
+def main():
+    """Start execution of word-frequency."""
+    args = parseArguments()
+    for file in args.files:
+        with open(file) as f:
+            c = Counter(words(f))
+        if len(args.files) > 1: print(file + ":")
+        [print(w) for w in c.most_common(args.count)]
+
+if __name__ == "__main__":
+    main()
