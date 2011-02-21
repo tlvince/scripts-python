@@ -8,6 +8,10 @@ import ctypes
 import subprocess
 import getpass
 import sys
+import logging
+
+from urllib.request import getproxies_registry
+from urllib.parse import urlparse
 
 def getMyDocs():
     """Return the path to My Documents.
@@ -36,14 +40,24 @@ def postHook():
         cmd = ["cmd.exe", "/k", "cd", getMyDocs()]
         subprocess.call(cmd)
 
+def getProxyHost():
+    """Return the proxy host and port from Windows registry."""
+    try:
+        proxy = getproxies_registry()["http"]
+        return urlparse(proxy).netloc.split(":")
+    except KeyError:
+        logging.error("Cannot retreive proxy settings from registry")
+
 def main():
     """Start execution of cmd."""
     un = getpass.getuser()
     pw = getpass.getpass()
 
-    # XXX: get these from CLI
-    host = ""
-    port = "8080"
+    try:
+        host, port = getProxyHost()
+    except Exception:
+        host = input("Host: ")
+        port = input("Port: ")
 
     setProxies(un, pw, host, port)
     postHook()
