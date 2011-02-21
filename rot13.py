@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# rot13: comparison of rot13 algorithms.
-# Copyright Tom Vincent <http://www.tlvince.com/contact/>
+# Copyright 2011 Tom Vincent <http://www.tlvince.com/contact/>
+
+"""A comparison of rot13 algorithms."""
+
 
 # The Zen of Python from this.py
 s = """Gur Mra bs Clguba, ol Gvz Crgref
@@ -44,7 +46,7 @@ def transTable(r=13):
     table = bytes.maketrans(alpha.encode(), rot13.encode())
     return bytes.translate(s.encode(), table).decode()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Compare the runtimes"""
     from timeit import Timer
     m = Timer("modulo()", "from __main__ import modulo")
