@@ -67,6 +67,7 @@ def isDownloaded(path):
         return True
 
 def extract(source, target, prefix):
+    """Extract the zip file to the given target."""
     prefix = prefix[:-4]
     try:
         if os.path.isdir(target):
