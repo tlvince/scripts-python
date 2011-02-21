@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2011 Tom Vincent <http://www.tlvince.com/contact/>
+
 """A (rather limited) UNIX find replacement."""
 
 import os
