@@ -7,24 +7,35 @@ import netrc
 import os.path
 import subprocess
 import argparse
+import gnupg
+import logging
+
+logging.basicConfig(format="%(name)s: %(levelname)s: %(message)s")
+logger = logging.getLogger(os.path.basename(__file__))
 
 def decrypt(netrc):
     """Decrypt the given GPG encrypted netrc file."""
-    cmd = ["gpg", "--no-tty", "--use-agent", "-q", "-d", netrc]
-    try:
-        out = subprocess.check_output(cmd)
-    except subprocess.CalledProcessError:
-        print "Could not decrypt netrc file"
+    gpg = gnupg.GPG(use_agent=True)
+    with open(netrc, mode="rb") as f:
+        decrypted = gpg.decrypt_file(f)
+    if not bool(decrypted):
+        # Bad exit status from gpg
+        logger.error(decrypted.status)
         quit()
     else:
-        return out
+        return str(decrypted)
 
 class mynetrc(netrc.netrc):
-    """Override netrc."""
-    def __init__(self, netrc, netrcIO):
+    """Override netrc to parse the already opened file.
+
+    The parent netrc constructor calls open. Since the file has
+    already been read using decrypt(), pass the contents (as a string)
+    directly.
+    """
+    def __init__(self, name, contents):
         self.hosts = {}
         self.macros = {}
-        self._parse(netrc, netrcIO)
+        self._parse(name, contents)
 
 def parseArguments():
     """Parse the command-line arguments."""
