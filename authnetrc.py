@@ -47,25 +47,31 @@ def decrypt(netrc):
     else:
         return str(decrypted)
 
-def authQuery(host, username=False, password=False):
-    """docstring for query"""
+def hostQuery(hostname):
+    """Return the authenticators for the given hostname."""
     netrc = os.path.expanduser("~/.netrc.gpg")
     try:
         decrypted = decrypt(netrc)
         parsed = mynetrc(netrc, decrypted)
         try:
-            (user, account, passw) = parsed.authenticators(host)
-
-            if username:
-                return(user)
-            elif password:
-                return(passw)
-            else:
-                return("\n".join([user, passw]))
-        except TypeError:
-            print "Invalid hostname"
+            auth = parsed.hosts[hostname]
+        except KeyError:
+            logger.error("hostname '%s' not found" % hostname)
+        else:
+            return auth
     except DecryptError:
         logger.error("netrc decryption failed")
+
+def authenticator(auths, username=False, account=False, password=False):
+    """Return the given elements of a hostname's authenticators."""
+    if hostAuth:
+        (user, account, passw) = auths
+        if username:
+            return(user)
+        elif password:
+            return(passw)
+        else:
+            return("\n".join([user, passw]))
 
 def parseArguments():
     """Parse the command-line arguments."""
@@ -80,7 +86,8 @@ def parseArguments():
 def main():
     """Start execution of authnetrc."""
     args = parseArguments()
-    auth = authQuery(args.host, args.username, args.password)
+    host = hostQuery(args.host)
+    auth = authenticator(host, args.username, args.password)
     if auth:
         print auth
 
