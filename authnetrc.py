@@ -1,14 +1,19 @@
 #!/usr/bin/env python2.7
 # Copyright 2011 Tom Vincent <http://www.tlvince.com/contact/>
 
-"""Return the credentials from an encrypted netrc file."""
+"""Return the credentials from an encrypted netrc file.
+
+Depends:
+    gnupg: http://code.google.com/p/python-gnupg/
+"""
 
 import netrc
 import os.path
 import subprocess
 import argparse
-import gnupg
 import logging
+
+import gnupg
 
 logging.basicConfig(format="%(name)s: %(levelname)s: %(message)s")
 logger = logging.getLogger(os.path.basename(__file__))
@@ -21,7 +26,6 @@ def decrypt(netrc):
     if not bool(decrypted):
         # Bad exit status from gpg
         logger.error(decrypted.status)
-        quit()
     else:
         return str(decrypted)
 
