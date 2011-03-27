@@ -64,6 +64,12 @@ def dryRun(matches):
                 print("{0} -> {1}".format(os.path.basename(m), 
                     os.path.basename(matches[m])))
 
+def move(matches):
+    """Rename the files that need padding."""
+    for source in matches:
+        target = matches[source]
+        os.rename(source, target)
+    
 def main():
     """Start execution of pad."""
     args = parseArguments()
@@ -72,6 +78,8 @@ def main():
     matches = pad(files)
     if args.dry_run:
         dryRun(matches)
+    else:
+        move(matches)
 
 if __name__ == "__main__":
     main()
