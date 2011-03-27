@@ -17,10 +17,10 @@ def main():
     """Start execution of septicise."""
     args = parseArguments()
     files = args.file
-    files = [os.file.basename(f) for f in files]        # Get files
+    files = [os.path.basename(f) for f in files]        # Get files
     files = [f.replace("-", " ") for f in files]        # Dash -> space
     files = [string.capwords(f, " ") for f in files]    # Title case words
-    files = [os.file.splitext(f)[0] for f in files]     # Remove extension
+    files = [os.path.splitext(f)[0] for f in files]     # Remove extension
     [print(f) for f in files]
 
 if __name__ == "__main__":
