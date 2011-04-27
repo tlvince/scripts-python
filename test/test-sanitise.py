@@ -12,11 +12,20 @@ def testAll():
         "éèêàùçÇ": "eeeaucc",
         "CRaZyCASE": "crazycase",
         "Bill & Ted": "bill-and-ted",
-        "file.mp3": "file.mp3",
+        "file.MP3": "file.mp3",
+        ".dotfile.txt": ".dotfile.txt",
+        "---heLLO": "hello",
+        "infix----dashes": "infix-dashes",
+        "---hello....txt.": "hello.txt",
     }
 
+    i = 1
     for case in cases:
-        assert sanitise(case) == cases[case]
+        expected = cases[case]
+        actual = sanitise(case)
+        print("({0}) {1}: {2} -> {3}".format(i, case, expected, actual))
+        assert expected == actual
+        i += 1
 
 def main():
     """Start execution of test-sanitise."""
