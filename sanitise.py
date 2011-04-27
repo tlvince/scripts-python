@@ -6,6 +6,7 @@
 import argparse
 import string
 import unicodedata
+import re
 
 def removeAccents(str):
     """Remove any form of UTF-8 accents.
@@ -15,18 +16,32 @@ def removeAccents(str):
     nkfd_form = unicodedata.normalize('NFKD', str)
     return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
+def regex(str):
+    """Perform detailed substitutions using regex."""
+
+    # List of (pattern, replacement) tuples
+    regex = [
+        ("&", "and"),       # Replace ampersand with a safe string
+        ("( |_)", "-"),     # See: http://webmasters.stackexchange.com/q/374
+        ("-{2,}", "-"),     # Flatten a series of two or more dashes
+        ("\.{2,}", "\."),   # Flatten a series of two or more dots
+        ("^-", ""),         # Remove a leading dash
+        ("(-$|\.$)", ""),   # Remove a trailing dash or dot
+    ]
+
+    for handler in regex:
+        str = re.sub(handler[0], handler[1], str)
+
+    return str
+
 def sanitise(str):
     """Perform substitutions and return the string."""
 
     str = removeAccents(str)
-
-    str = str.replace("&", "and")
-    str = str.replace("_", "-")
-    str = str.replace(" ", "-")
+    str = regex(str)
 
     valid = string.ascii_letters + string.digits + "-."
     str = "".join([chr for chr in str if chr in valid])
-
     return str.lower()
 
 def parseArguments():
