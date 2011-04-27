@@ -46,7 +46,7 @@ def main():
     setProxies(un, pw, host, port)
 
     # Start a child shell to inherit the new environment variables
-    subprocess.call(["cmd.exe"])
+    subprocess.call(["cmd.exe", "/k", "title", "cmd"])
 
 if __name__ == "__main__":
     main()
