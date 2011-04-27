@@ -16,7 +16,7 @@ def removeAccents(str):
     nkfd_form = unicodedata.normalize('NFKD', str)
     return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
-def regex(str):
+def regexSanitise(str):
     """Perform detailed substitutions using regex."""
 
     # List of (pattern, replacement) tuples
@@ -36,15 +36,13 @@ def regex(str):
 
 def sanitise(str):
     """Perform substitutions and return the string."""
-
+    str = str.lower()
     str = removeAccents(str)
-    str = regex(str)
+    str = regexSanitise(str)
 
     # Permit only letters, digits, dash (seperator) and dot (file extension)
-    valid = string.ascii_letters + string.digits + "-."
-    str = "".join([chr for chr in str if chr in valid])
-
-    return str.lower()
+    valid = string.ascii_lowercase + string.digits + "-."
+    return "".join([chr for chr in str if chr in valid])
 
 def parseArguments():
     """Parse the command-line arguments."""
