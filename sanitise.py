@@ -17,7 +17,7 @@ def removeAccents(str):
     return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 def regexSanitise(str):
-    """Perform detailed substitutions using regex."""
+    """Perform detailed sanitising substitutions using regex."""
 
     # List of (pattern, replacement) tuples
     regex = [
