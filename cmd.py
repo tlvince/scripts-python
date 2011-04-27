@@ -4,22 +4,12 @@
 """Setup cmd with some sane defaults."""
 
 import os
-import ctypes
 import subprocess
 import getpass
-import sys
 import logging
 
 from urllib.request import getproxies_registry
 from urllib.parse import urlparse
-
-def getMyDocs():
-    """Return the path to My Documents.
-    http://stackoverflow.com/questions/3927259/how-do-you-get-the-exact-path-to-my-documents/3927493#3927493"""
-    dll = ctypes.windll.shell32
-    buf = ctypes.create_unicode_buffer(300)
-    dll.SHGetSpecialFolderPathW(None, buf, 0x0005, False)
-    return buf.value
 
 def setProxies(user, password, host, port):
     """Set proxy variables for the currently running shell."""
@@ -33,12 +23,6 @@ def setProxies(user, password, host, port):
         os.putenv(scheme + '_proxy',
             "{0}://{1}:{2}@{3}:{4}".format(base, user, password, host, port)
         )
-
-def postHook():
-    """Perform some platform-specific post operations."""
-    if sys.platform == "win32":
-        cmd = ["cmd.exe", "/k", "cd", getMyDocs()]
-        subprocess.call(cmd)
 
 def getProxyHost():
     """Return the proxy host and port from Windows registry."""
@@ -60,7 +44,9 @@ def main():
         port = input("Port: ")
 
     setProxies(un, pw, host, port)
-    postHook()
+
+    # Start a child shell to inherit the new environment variables
+    subprocess.call(["cmd.exe"])
 
 if __name__ == "__main__":
     main()
