@@ -40,8 +40,10 @@ def sanitise(str):
     str = removeAccents(str)
     str = regex(str)
 
+    # Permit only letters, digits, dash (seperator) and dot (file extension)
     valid = string.ascii_letters + string.digits + "-."
     str = "".join([chr for chr in str if chr in valid])
+
     return str.lower()
 
 def parseArguments():
