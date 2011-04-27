@@ -21,16 +21,16 @@ def regex(str):
 
     # List of (pattern, replacement) tuples
     regex = [
-        ("&", "and"),       # Replace ampersand with a safe string
-        ("( |_)", "-"),     # See: http://webmasters.stackexchange.com/q/374
-        ("-{2,}", "-"),     # Flatten a series of two or more dashes
-        ("\.{2,}", "\."),   # Flatten a series of two or more dots
-        ("^-", ""),         # Remove a leading dash
-        ("(-$|\.$)", ""),   # Remove a trailing dash or dot
+        ("&", "and"),           # Replace ampersand with a safe string
+        ("( |_)", "-"),         # See: http://webmasters.stackexchange.com/q/374
+        ("(\.|-){2,}", "\\1"),  # Flatten a series of two or more dots or dashes
+        ("^-", ""),             # Remove a leading dash
+        ("(-$|\.$)", ""),       # Remove a trailing dash or dot
     ]
 
     for handler in regex:
-        str = re.sub(handler[0], handler[1], str)
+        pattern, replacement = handler
+        str = re.sub(pattern, replacement, str)
 
     return str
 
