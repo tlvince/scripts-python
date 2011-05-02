@@ -45,7 +45,7 @@ def download(remote, local):
 def verifyDownload(fileSize, local):
     """Make some attempts to check the file was downloaded correctly."""
     try:
-        assert os.stat(local).st_size == total
+        assert os.stat(local).st_size == fileSize
     except AssertionError:
         logging.warning("Downloaded file size does not match expect.")
         logging.info("The file maybe corrupt or incomplete.")
