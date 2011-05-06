@@ -81,6 +81,8 @@ def main():
 
     for repo in args.repos:
         try:
+            # Convert relative paths to absolute
+            repo = os.path.abspath(repo)
             hasRepo(repo)
             tag = describe(repo)
             createArchive(repo, tag)
