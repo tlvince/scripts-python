@@ -28,8 +28,8 @@ def createArchive(path, tag, type="zip", treeish="HEAD"):
 
     try:
         subprocess.check_call(cmd)
-    except CalledProcessError as e:
-        logging.error(e)
+    except subprocess.CalledProcessError as e:
+        logging.debug(e)
 
 def describe(path):
     """Return the output from git describe on the given path."""
@@ -43,8 +43,8 @@ def describe(path):
 
     try:
         tag = subprocess.check_output(gitDescribe)
-    except CalledProcessError as e:
-        logging.error(e)
+    except subprocess.CalledProcessError as e:
+        logging.debug(e)
 
     # Just get the tag as a string
     return tag.decode().split("\n")[0]
