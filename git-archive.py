@@ -16,14 +16,14 @@ def createArchive(path, tag, type="zip", treeish="HEAD"):
     # Sanitised basename of the repository root
     name = sanitise(os.path.basename(path))
 
-    # Create a build directory in the repository (if it doesn't already exist)
-    build = os.path.join(path, "build")
-    if not os.path.exists(build):
-        os.mkdir(build)
+    # Create a dist directory in the repository (if it doesn't already exist)
+    dist = os.path.join(path, "dist")
+    if not os.path.exists(dist):
+        os.mkdir(dist)
 
     cmd = ["git", "archive", "--format", "{0}".format(type), "-9",
         "--prefix", "{0}/".format(name), 
-        "--output", "{0}-{1}.{2}".format(os.path.join(build, name), tag, type),
+        "--output", "{0}-{1}.{2}".format(os.path.join(dist, name), tag, type),
         treeish]
 
     try:
