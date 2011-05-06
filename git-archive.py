@@ -8,13 +8,13 @@ import logging
 import os
 import subprocess
 
-from sanitise import sanitise
+try:
+    from sanitise import sanitise
+except ImportError as e:
+    logging.warn(e)
 
-def createArchive(path, tag, type="zip", treeish="HEAD"):
+def createArchive(path, tag, name, type="zip", treeish="HEAD"):
     """Create an archive from the repository in the given path."""
-
-    # Sanitised basename of the repository root
-    name = sanitise(os.path.basename(path))
 
     # Create a dist directory in the repository (if it doesn't already exist)
     dist = os.path.join(path, "dist")
@@ -30,6 +30,19 @@ def createArchive(path, tag, type="zip", treeish="HEAD"):
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError as e:
         logging.debug(e)
+
+def saneName(path):
+    """Return a sane name from the repository's path."""
+    base = os.path.basename(path)
+    try:
+        # Sanitised basename of the repository root
+        name = sanitise(base)
+    except NameError:
+        logging.warn("The sanitise module was not imported")
+        logging.warn("Using repository basename as is")
+        name = base
+
+    return name
 
 def describe(path):
     """Return the output from git describe on the given path."""
@@ -85,7 +98,8 @@ def main():
             repo = os.path.abspath(repo)
             hasRepo(repo)
             tag = describe(repo)
-            createArchive(repo, tag)
+            name = saneName(repo)
+            createArchive(repo, tag, name)
         except GitArchiveException as e:
             logging.error(e)
             logging.info("Please specify a path containing a git repository")
