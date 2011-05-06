@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 # Copyright 2011 Tom Vincent <http://www.tlvince.com/contact/>
 
-"""Automated git archive creation."""
+"""Automated git archive creation.
+
+Uses 'git archive' to create a compressed archive of the respository's
+working directory. The resulting archive's name is composed of a
+sanitised form of the working directory's basename and repository
+metadata taken from 'git describe'.
+"""
 
 import argparse
 import logging
