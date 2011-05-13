@@ -83,16 +83,6 @@ def extract(source, target, prefix):
         )
         logging.info("Please close Chromium and try again.")
 
-def getLogger():
-    """Setup the console logger."""
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(levelname)s: %(message)s")
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-
 def main():
     """Start execution of chromium-update."""
     url = "http://build.chromium.org/f/chromium/snapshots/chromium-rel-xp/"
@@ -101,7 +91,9 @@ def main():
     savePath = os.path.join(local, chrome)
     extractPath = os.path.join(os.path.expandvars("%ProgramFiles%"), "Chromium")
 
-    getLogger()
+    logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
+        level=logging.DEBUG)
+
     if not isDownloaded(savePath):
         build = getBuild(url + "LATEST")
         size = download(url + "/" + build + "/" + chrome, savePath)
