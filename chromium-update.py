@@ -94,11 +94,14 @@ def main():
     logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
         level=logging.DEBUG)
 
-    if not isDownloaded(savePath):
-        build = getBuild(url + "LATEST")
-        size = download(url + "/" + build + "/" + chrome, savePath)
-        verifyDownload(size, savePath)
-    extract(savePath, extractPath, chrome)
+    try:
+        if not isDownloaded(savePath):
+            build = getBuild(url + "LATEST")
+            size = download(url + "/" + build + "/" + chrome, savePath)
+            verifyDownload(size, savePath)
+        extract(savePath, extractPath, chrome)
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     main()
