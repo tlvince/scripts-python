@@ -58,13 +58,11 @@ def downloadProgress(blockSize, totalSize):
 
 def isDownloaded(path):
     """Naively check if it's already downloaded."""
-    try:
-        if os.path.isfile(path):
-            raise Exception
-    except Exception:
+    if os.path.isfile(path):
         logging.warning("Using existing file:\n{0}".format(path))
         logging.info("Skipping download")
         return True
+    return False
 
 def extract(source, target, prefix):
     """Extract the zip file to the given target."""
