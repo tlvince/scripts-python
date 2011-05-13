@@ -71,6 +71,7 @@ def extract(source, target, prefix):
         if os.path.isdir(target):
             shutil.rmtree(target)
         zip = zipfile.ZipFile(source)
+        logging.info("Extracting archive")
         zip.extractall(os.path.dirname(target))     # leading chrome-win32
         # move it to the real target
         shutil.move(os.path.join(os.path.dirname(target), prefix), target)
@@ -83,7 +84,7 @@ def extract(source, target, prefix):
 
 def main():
     """Start execution of chromium-update."""
-    url = "http://build.chromium.org/f/chromium/snapshots/chromium-rel-xp/"
+    url = "http://build.chromium.org/f/chromium/snapshots/chromium-rel-xp"
     chrome = "chrome-win32.zip"
     local = os.path.join(os.path.expanduser("~"), "My Documents", "dwn", "unsorted")
     savePath = os.path.join(local, chrome)
