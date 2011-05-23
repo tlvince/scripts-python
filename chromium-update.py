@@ -95,7 +95,7 @@ def main():
 
     try:
         if not isDownloaded(savePath):
-            build = getBuild(url + "LATEST")
+            build = getBuild(url + "/" + "LATEST")
             size = download(url + "/" + build + "/" + chrome, savePath)
             verifyDownload(size, savePath)
         extract(savePath, extractPath, chrome)
