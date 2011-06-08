@@ -22,7 +22,7 @@ def docSynopsis(file):
 
     synopsis = docstring.strip('."\n').lower()
     if not synopsis:
-        synopsis = "no synopsis found"
+        raise Exception("'{0}' does not contain a synopsis".format(file))
 
     return "{0}: {1}".format(file, synopsis)
 
