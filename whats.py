@@ -8,7 +8,7 @@ import os.path
 import sys
 
 def docSynopsis(file):
-    """Return a docstring synposis from the given Python file."""
+    """Return a docstring synopsis from the given Python file."""
     if not os.path.isfile(file):
         raise Exception("'{0}' is not a file".format(file))
 
@@ -19,8 +19,12 @@ def docSynopsis(file):
     with open(file, encoding="utf-8") as f:
         # XXX: Relies on my coding style
         docstring = f.readlines()[3]
-        formatted = docstring.strip('."\n').lower()
-        return "{0}: {1}".format(file, formatted)
+
+    synopsis = docstring.strip('."\n').lower()
+    if not synopsis:
+        synopsis = "no synopsis found"
+
+    return "{0}: {1}".format(file, synopsis)
 
 def parseArguments():
     """Parse the command-line arguments."""
