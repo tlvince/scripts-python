@@ -16,9 +16,12 @@ def docSynopsis(file):
     if ext != ".py":
         raise Exception("'{0}' is not a valid Python file".format(file))
     
-    with open(file, encoding="utf-8") as f:
-        # XXX: Relies on my coding style
-        docstring = f.readlines()[3]
+    try:
+        with open(file, encoding="utf-8") as f:
+            # XXX: Relies on my coding style
+            docstring = f.readlines()[3]
+    except:
+        raise
 
     synopsis = docstring.strip('."\n').lower()
     if not synopsis:
