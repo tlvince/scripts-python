@@ -84,7 +84,7 @@ def extract(source, target, prefix):
 
 def main():
     """Start execution of chromium-update."""
-    url = "http://build.chromium.org/f/chromium/snapshots/chromium-rel-xp"
+    url = "http://commondatastorage.googleapis.com/chromium-browser-continuous/Win"
     chrome = "chrome-win32.zip"
     local = os.path.join(os.path.expanduser("~"), "My Documents", "dwn", "unsorted")
     savePath = os.path.join(local, chrome)
@@ -95,7 +95,7 @@ def main():
 
     try:
         if not isDownloaded(savePath):
-            build = getBuild(url + "/" + "LATEST")
+            build = getBuild(url + "/" + "LAST_CHANGE")
             size = download(url + "/" + build + "/" + chrome, savePath)
             verifyDownload(size, savePath)
         extract(savePath, extractPath, chrome)
