@@ -58,13 +58,11 @@ def downloadProgress(blockSize, totalSize):
 
 def isDownloaded(path):
     """Naively check if it's already downloaded."""
-    try:
-        if os.path.isfile(path):
-            raise Exception
-    except Exception:
+    if os.path.isfile(path):
         logging.warning("Using existing file:\n{0}".format(path))
         logging.info("Skipping download")
         return True
+    return False
 
 def extract(source, target, prefix):
     """Extract the zip file to the given target."""
@@ -73,6 +71,7 @@ def extract(source, target, prefix):
         if os.path.isdir(target):
             shutil.rmtree(target)
         zip = zipfile.ZipFile(source)
+        logging.info("Extracting archive")
         zip.extractall(os.path.dirname(target))     # leading chrome-win32
         # move it to the real target
         shutil.move(os.path.join(os.path.dirname(target), prefix), target)
@@ -83,30 +82,25 @@ def extract(source, target, prefix):
         )
         logging.info("Please close Chromium and try again.")
 
-def getLogger():
-    """Setup the console logger."""
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(levelname)s: %(message)s")
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-
 def main():
     """Start execution of chromium-update."""
-    url = "http://build.chromium.org/f/chromium/snapshots/chromium-rel-xp/"
+    url = "http://commondatastorage.googleapis.com/chromium-browser-continuous/Win"
     chrome = "chrome-win32.zip"
     local = os.path.join(os.path.expanduser("~"), "My Documents", "dwn", "unsorted")
     savePath = os.path.join(local, chrome)
     extractPath = os.path.join(os.path.expandvars("%ProgramFiles%"), "Chromium")
 
-    getLogger()
-    if not isDownloaded(savePath):
-        build = getBuild(url + "LATEST")
-        size = download(url + "/" + build + "/" + chrome, savePath)
-        verifyDownload(size, savePath)
-    extract(savePath, extractPath, chrome)
+    logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
+        level=logging.DEBUG)
+
+    try:
+        if not isDownloaded(savePath):
+            build = getBuild(url + "/" + "LAST_CHANGE")
+            size = download(url + "/" + build + "/" + chrome, savePath)
+            verifyDownload(size, savePath)
+        extract(savePath, extractPath, chrome)
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     main()
