@@ -7,6 +7,7 @@ import argparse
 import string
 import unicodedata
 import re
+import random
 
 def removeAccents(str):
     """Remove any form of UTF-8 accents.
@@ -42,7 +43,12 @@ def sanitise(str):
 
     # Permit only letters, digits, dash (seperator) and dot (file extension)
     valid = string.ascii_lowercase + string.digits + "-."
-    return "".join([chr for chr in str if chr in valid])
+    str = "".join([chr for chr in str if chr in valid])
+
+    if not str:
+        str = "untitled-" + "".join(random.sample(valid[:-2], 6))
+
+    return str
 
 def parseArguments():
     """Parse the command-line arguments."""

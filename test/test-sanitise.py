@@ -5,7 +5,8 @@ from sanitise import sanitise
 
 """Test strings for sanitise."""
 
-def testAll():
+def testReplacements():
+    """Coverage for find and replace cases."""
     cases = {
         "hello": "hello",
         "foo-bar#baz?qux@127/\\9]": "foo-barbazqux1279",
@@ -27,9 +28,15 @@ def testAll():
         assert expected == actual
         i += 1
 
-def main():
-    """Start execution of test-sanitise."""
-    testAll()
+def testUnamed():
+    """Special case when all characters are removed.
 
-if __name__ == "__main__":
-    main()
+    In cases when the string contains no sanitisable characters, it should be
+    replaced with a prefix and 6 random elements from the permitted character
+    set.
+    """
+    actual = sanitise("!£$%")
+    prefix = "untitled-"
+
+    assert actual.startswith(prefix)
+    assert len(actual) == len(prefix) + 6
