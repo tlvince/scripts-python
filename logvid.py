@@ -7,7 +7,6 @@ import os
 import random
 import logging
 import argparse
-import pprint
 import subprocess
 
 def set_environment():
@@ -57,7 +56,7 @@ def log(video, watched_file):
             file.write(video + "\t" + rating)
 
 def main():
-    """Start execution of logvid.py"""
+    """Start execution of logvid."""
     args = parse_arguments()
 
     # Configure the stdout logger
@@ -79,4 +78,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
