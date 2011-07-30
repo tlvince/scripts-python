@@ -25,7 +25,8 @@ def parse_arguments():
 def main():
     """Start execution of tedhd."""
     args = parse_arguments()
-    reg = re.compile('<a href="(.*?)">Watch high-res video \(MP4\)</a>')
+    # Oh, hi Coding Horror
+    reg = re.compile('<a href="(.*?)">High-res video \(MP4\)</a>')
 
     try:
         with open(args.urls) as f:
@@ -41,7 +42,7 @@ def main():
             con = urllib.request.urlopen(url)
             html = con.read().decode()
             video = reg.search(html).group(1)
-            print("http://www.ted.com{0}".format(video))
+            print(video)
         except AttributeError:
             print("No video URL found on page '{0}'".format(url),
                 file=sys.stderr)
