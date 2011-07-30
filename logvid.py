@@ -22,12 +22,25 @@ def set_environment():
 
     return watched
 
-def queue(videos, watched_videos):
+def queue_path(videos, watched_videos):
     """Find an unwatched video."""
     unwatched = videos.difference(watched_videos)
     try:
         return random.choice(list(unwatched))
     except IndexError:
+        raise Exception("No more videos to watch")
+
+def queue_file(playlist, watched_videos):
+    """Return an unwatched video from a playlist file."""
+    for video in playlist:
+        basename = os.path.basename(video)
+        if basename not in watched_videos:
+            unwatched = video
+            break
+
+    try:
+        return unwatched
+    except NameError:
         raise Exception("No more videos to watch")
 
 def parse_arguments():
@@ -38,22 +51,25 @@ def parse_arguments():
     parser.add_argument("-p", "--player", nargs="?",
         default="mplayer -really-quiet -fs",
         help="the command to the play the video")
+    parser.add_argument("-f", "--file", nargs="?",
+        help="read video paths from a playlist file")
     return parser.parse_args()
 
-def read_watched(path):
-    """Return a set of the contents of a watched file."""
-    watched = set()
+def parse_watched(watched_arr):
+    """Return a set of filenames from a read watched file."""
+    return set([f.split("\t")[0] for f in watched_arr])
+
+def read_file(path):
+    """Return the contents of a file."""
     with open(path, encoding="utf-8") as file:
-        for f in file:
-            watched.add(f.split("\t")[0])
-    return watched
+        return file.read().splitlines()
 
 def log(video, watched_file):
     """Log a watched video if it was rated."""
     rating = input(os.path.basename(__file__) + ": rating: ")
     if (rating == "0" or rating == "1"):
         with open(watched_file, mode="a+") as file:
-            file.write(video + "\t" + rating)
+            file.write("{0}\t{1}\n".format(os.path.basename(video), rating))
 
 def main():
     """Start execution of logvid."""
@@ -65,9 +81,16 @@ def main():
 
     try:
         watched_file = set_environment()
-        videos = set(os.listdir(args.path))
-        watched_videos = read_watched(watched_file)
-        video = queue(videos, watched_videos)
+        if args.file:
+            videos = read_file(os.path.expanduser(args.file))
+        else:
+            videos = set(os.listdir(args.path))
+        watched_videos = read_file(watched_file)
+        watched_videos = parse_watched(watched_videos)
+        if args.file:
+            video = queue_file(videos, watched_videos)
+        else:
+            video = queue_path(videos, watched_videos)
         logging.info("playing: " + video)
         subprocess.call(args.player.split() + [os.path.join(args.path, video)])
         log(video, watched_file)
