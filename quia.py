@@ -3,7 +3,7 @@
 
 """A quvi-aria2 wrapper.
 
-Parses the given media URL using quvi and passes its raw URL to an aria2 daemon.
+Parses a given media URL using quvi and passes its raw URL to an aria2 daemon.
 """
 
 import urllib2
@@ -23,7 +23,7 @@ def parse_args():
 def parse_url(url):
     """Return a dictonary of media properties.
 
-    url - A media webpage URL (in the form http://...)
+    url - A quvi-supported media webpage URL.
     """
     q = quvi.Quvi()
     q.parse(url)
@@ -31,7 +31,16 @@ def parse_url(url):
 
 def download(url, name, ext, username="aria2", password="aria2",
              host="localhost", port=25001):
-    """Download the given URL using aria2."""
+    """Download the given URL using aria2.
+
+    url         - The raw media URL to download.
+    name        - The filename to write to.
+    ext         - The media's file extension.
+    username    - aria2 daemon username.
+    password    - aria2 daemon password.
+    host        - aria2 daemon hostname.
+    port        - arai2 daemon port.
+    """
     opts = dict(out=name + "." + ext)
     jsonreq = json.dumps({"id":name, "method":"aria2.addUri", "params":[[url],
         opts]})
