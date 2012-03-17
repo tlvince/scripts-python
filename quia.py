@@ -25,9 +25,7 @@ def parse_url(url):
 
     url - A quvi-supported media webpage URL.
     """
-    q = quvi.Quvi()
-    q.parse(url)
-    return q.getproperties()
+    return q.get_properties_best_quality(url)
 
 def download(url, name, ext, username="aria2", password="aria2",
              host="localhost", port=25001):
@@ -65,7 +63,7 @@ def main():
     logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
             level=logging.INFO)
     args = parse_args()
-    props = parse_url(args.url)
+    props = quvi.get_properties_best_quality(args.url)
     download(props["mediaurl"], props["pagetitle"], props["filesuffix"])
 
 if __name__ == "__main__":
