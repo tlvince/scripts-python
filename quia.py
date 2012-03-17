@@ -57,7 +57,10 @@ def main():
             level=logging.INFO)
     args = parse_args()
     props = quvi.get_properties_best_quality(args.url)
-    download(props["mediaurl"], props["pagetitle"], props["filesuffix"])
+    if props != None:
+        download(props["mediaurl"], props["pagetitle"], props["filesuffix"])
+    else:
+        logging.error("quvi does not support URL '{0}'".format(args.url))
 
 if __name__ == "__main__":
     main()
