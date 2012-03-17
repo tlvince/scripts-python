@@ -20,13 +20,6 @@ def parse_args():
     parser.add_argument("url", help="A quvi-supported URL to download")
     return parser.parse_args()
 
-def parse_url(url):
-    """Return a dictonary of media properties.
-
-    url - A quvi-supported media webpage URL.
-    """
-    return q.get_properties_best_quality(url)
-
 def download(url, name, ext, username="aria2", password="aria2",
              host="localhost", port=25001):
     """Download the given URL using aria2.
