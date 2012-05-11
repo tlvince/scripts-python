@@ -63,7 +63,7 @@ def write_config(path):
         }
 
         config["meta"] = {
-            "title":        "ThinkThunk",
+            "title":        "Think",
             "author":       "Tom Vincent",
             "subject":      "Articles",
         }
