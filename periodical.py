@@ -81,7 +81,7 @@ def log(path, urls, date):
     dirname = os.path.dirname(path)
     if not os.path.exists(dirname):
         os.makedirs(dirname)
-    with open(path, "w") as logfile:
+    with open(path, "a") as logfile:
         for url in urls:
             logfile.write("{0} {1}\n".format(date.strftime("%Y%m%d"), url))
 
