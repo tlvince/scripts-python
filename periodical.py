@@ -89,7 +89,7 @@ def parse_args(config, log, url):
     """Parse the command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("url", help="the article URL", nargs="?")
+    parser.add_argument("url", help="the article URL", nargs="*")
     parser.add_argument("-c", "--config", default=config,
         help="path to config file")
     parser.add_argument("-l", "--log", default=log,
@@ -130,7 +130,7 @@ def main():
     write_yaml(config["meta"], mobi, tmp, date)
     write_html(config, tmp, args.url)
 
-    if os.path.exists(os.path.join(tmp, "sections", "0")):
+    if os.path.exists(os.path.join(tmp, "sections", "0", "0.html")):
         subprocess.call(["kindlerb", tmp])
         kindle = config["environment"]["kindle_ssh"]
         subprocess.call(["scp", os.path.join(tmp, mobi),
@@ -141,6 +141,7 @@ def main():
 
     if config["option"]["logging"].title():
         log(args.log, args.url, date)
+        os.remove(args.file)
 
 if __name__ == "__main__":
     main()
