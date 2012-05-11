@@ -12,6 +12,8 @@ import tempfile
 import subprocess
 import configparser
 
+from sys import exit
+
 app = "periodical"
 
 def write_html(config, path, urls):
@@ -83,14 +85,17 @@ def log(path, urls, date):
         for url in urls:
             logfile.write("{0} {1}\n".format(date.strftime("%Y%m%d"), url))
 
-def parse_args(config, log):
+def parse_args(config, log, url):
     """Parse the command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("url", help="the article URL", nargs="+")
+    parser.add_argument("url", help="the article URL", nargs="?")
     parser.add_argument("-c", "--config", default=config,
         help="path to config file")
-    parser.add_argument("-l", "--log", default=log, help="path to log file")
+    parser.add_argument("-l", "--log", default=log,
+        help="path to log file")
+    parser.add_argument("-f", "--file", default=url, nargs="?",
+        help="path to a file containing URLs")
     return parser.parse_args()
 
 def main():
@@ -104,8 +109,17 @@ def main():
     if not data_path:
         data_path = os.path.join(os.getenv("HOME"), ".local", "share")
     log_path = os.path.join(data_path, app, app + ".log")
+    url_path = os.path.join(data_path, app, app + "-urls.txt")
     
-    args = parse_args(config_path, log_path)
+    args = parse_args(config_path, log_path, url_path)
+    if not args.url:
+        if not args.file: args.file = url_path
+        if os.path.exists(args.file) and os.path.getsize(args.file) > 0:
+            with open(args.file) as f:
+                args.url = f.read().splitlines()
+        else:
+            exit(1)
+
     write_config(args.config)
     config = configparser.ConfigParser()
     config.read(args.config)
@@ -121,8 +135,8 @@ def main():
         kindle = config["environment"]["kindle_ssh"]
         subprocess.call(["scp", os.path.join(tmp, mobi),
             "{0}:/mnt/us/documents/".format(kindle)])
-        refresh = "dbus-send --system /default com.lab126.powerd.resuming int32:1"
-        subprocess.call(["ssh", kindle, refresh])
+        subprocess.call(["ssh", kindle, 
+            "dbus-send --system /default com.lab126.powerd.resuming int32:1"])
     shutil.rmtree(tmp)
 
     if config["option"]["logging"].title():
