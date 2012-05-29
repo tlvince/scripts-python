@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # Copyright 2012 Tom Vincent <http://tlvince.com/contact/>
 
-"""Extract SMS messages from a Gammu backup."""
+"""Extract SMS messages from a Gammu backup.
+
+Consider rewriting using python-gammu:
+https://github.com/gammu/gammu/blob/master/python/examples/read-sms-backup.py
+"""
 
 import configparser
 import binascii
