@@ -1,18 +1,21 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # Copyright 2012 Tom Vincent <http://tlvince.com/contact/>
 
 """Create a Kindle periodical from given URLs."""
 
 import os
-import yaml
 import shutil
 import datetime
 import argparse
 import tempfile
 import subprocess
-import configparser
+import ConfigParser
+
+import yaml
 
 from sys import exit
+
+from boilerpipe.extract import Extractor
 
 app = "periodical"
 
@@ -22,27 +25,26 @@ def write_html(config, path, urls):
     section = os.path.join(path, "sections", str(i))
     os.makedirs(section)
     for url in urls:
-        cmd = config["environment"]["extractor_cmd"].split()
-        cmd.append(url)
         html = os.path.join(section, "{0}.html".format(i))
         with open(os.path.join(section, "_section.txt"), "w") as f:
-            f.write(config["meta"]["subject"])
+            f.write(config.get("meta", "subject"))
+        extractor = Extractor(extractor="ArticleExtractor", url=url)
         with open(html, "w") as f:
-            subprocess.call(cmd, stdout=f)
+            f.write(extractor.getHTML().encode("utf8"))
         if os.path.getsize(html) == 0:
             os.remove(html)
         else:
             i = i + 1
 
-def write_yaml(meta, mobi, path, date):
+def write_yaml(config, mobi, path, date):
     """Write document YAML."""
     doc = {
         "doc_uuid":     "{0}-{1}".format(app, date.strftime("%Y%m%d%H%M%S")),
-        "title":        "{0} {1}".format(meta["title"],
+        "title":        "{0} {1}".format(config.get("meta", "title"),
                                          date.strftime("%Y-%m-%d")),
-        "author":       meta["author"],
-        "publisher":    meta["author"],
-        "subject":      meta["subject"],
+        "author":       config.get("meta", "author"),
+        "publisher":    config.get("meta", "author"),
+        "subject":      config.get("meta", "subject"),
         "date":         date.strftime("%Y-%m-%d"),
         "mobi_outfile": mobi,
     }
@@ -50,25 +52,20 @@ def write_yaml(meta, mobi, path, date):
     with open(os.path.join(path, "_document.yml"), "w") as f:
         yaml.dump(doc, f)
 
-def write_config(path):
+def write_config(config, path):
     """Write the default configuration file."""
     if not os.path.exists(path):
-        config = configparser.ConfigParser()
 
-        config["environment"] = {
-            "extractor_cmd": "java -jar extractor.jar",
-            "kindle_ssh":    "kindle",
-        }
+        config.add_section("environment")
+        config.set("environment", "kindle_ssh", "kindle")
 
-        config["option"] = {
-            "logging":      "true",
-        }
+        config.add_section("option")
+        config.set("option", "logging", "true")
 
-        config["meta"] = {
-            "title":        "Think",
-            "author":       "Tom Vincent",
-            "subject":      "Articles",
-        }
+        config.add_section("meta")
+        config.set("meta", "title", "Think")
+        config.set("meta", "author", "Tom Vincent")
+        config.set("meta", "subject", "Articles")
 
         dirname = os.path.dirname(path)
         if not os.path.exists(dirname):
@@ -120,28 +117,28 @@ def main():
         else:
             exit(1)
 
-    write_config(args.config)
-    config = configparser.ConfigParser()
+    config = ConfigParser.ConfigParser()
+    write_config(config, args.config)
     config.read(args.config)
 
     tmp = tempfile.mkdtemp()
     date = datetime.datetime.now()
     mobi = "{0}-{1}.mobi".format(app, date.strftime("%Y%m%d%H%M%S"))
-    write_yaml(config["meta"], mobi, tmp, date)
+
+    write_yaml(config, mobi, tmp, date)
     write_html(config, tmp, args.url)
 
     if os.path.exists(os.path.join(tmp, "sections", "0", "0.html")):
         subprocess.call(["kindlerb", tmp])
-        kindle = config["environment"]["kindle_ssh"]
+        kindle = config.get("environment", "kindle_ssh")
         subprocess.call(["scp", os.path.join(tmp, mobi),
             "{0}:/mnt/us/documents/".format(kindle)])
         subprocess.call(["ssh", kindle, 
             "dbus-send --system /default com.lab126.powerd.resuming int32:1"])
-    shutil.rmtree(tmp)
+    #shutil.rmtree(tmp)
 
-    if config["option"]["logging"].title():
+    if config.get("option", "logging").title():
         log(args.log, args.url, date)
-        os.remove(args.file)
 
 if __name__ == "__main__":
     main()
